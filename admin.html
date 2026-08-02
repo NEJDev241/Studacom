@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studacom — Espace Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="assets/config.js"></script>
+<style>
+:root{--cream:#F6F1E6;--navy:#16213A;--amber:#E7A83B;--amber-dark:#C88C22;--muted:#5B6478;--white:#fff;--radius:16px;--shadow:0 10px 30px -12px rgba(22,33,58,.2);--teal:#2F6B5E;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--navy);}
+h1,h2,h3{font-family:'Sora',sans-serif;}
+header{background:var(--navy);color:#fff;padding:18px 30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+header h1{font-size:1.1rem;display:flex;align-items:center;gap:8px;}
+header .right{display:flex;align-items:center;gap:16px;}
+header a, header button.link{color:var(--amber);font-size:.85rem;text-decoration:none;font-weight:600;background:none;border:none;cursor:pointer;font-family:inherit;}
+.wrap{max-width:1000px;margin:0 auto;padding:36px 24px 80px;}
+
+.login-wrap{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:40px;max-width:380px;width:100%;}
+.login-card h2{margin-bottom:6px;}
+.login-card p{color:var(--muted);font-size:.88rem;margin-bottom:24px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:.8rem;font-weight:600;margin-bottom:6px;color:var(--muted);}
+.field input,.field select,.field textarea{width:100%;padding:11px 13px;border-radius:9px;border:1px solid #ddd;font-family:inherit;font-size:.92rem;background:var(--cream);}
+.btn{padding:11px 22px;border-radius:999px;border:none;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;font-size:.87rem;}
+.btn-amber{background:var(--amber);color:var(--navy);}
+.btn-amber:hover{background:var(--amber-dark);}
+.btn-navy{background:var(--navy);color:#fff;}
+.btn-danger{background:#fbe2e2;color:#a33;}
+.btn-full{width:100%;text-align:center;}
+.error-box{background:#fde8e8;color:#a33;padding:10px 14px;border-radius:9px;font-size:.85rem;margin-bottom:16px;display:none;}
+
+.tabs{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+.tab-btn{padding:10px 18px;border-radius:999px;border:1.5px solid #ddd;background:var(--white);cursor:pointer;font-family:'Sora',sans-serif;font-size:.83rem;color:var(--muted);}
+.tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+.panel{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px;margin-bottom:24px;}
+.panel h2{font-size:1.05rem;margin-bottom:16px;}
+.row{display:grid;grid-template-columns:56px 1fr 2fr auto auto;gap:8px;align-items:center;margin-bottom:10px;}
+.row input,.row select,.row textarea{padding:9px 11px;border-radius:8px;border:1px solid #ddd;font-family:inherit;font-size:.86rem;width:100%;}
+.row button{border:none;border-radius:8px;height:36px;cursor:pointer;font-size:.85rem;padding:0 12px;}
+.actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center;}
+.saved-msg{font-size:.83rem;color:var(--teal);display:none;}
+.empty{color:var(--muted);font-size:.85rem;padding:14px 0;}
+
+table{width:100%;border-collapse:collapse;font-size:.85rem;}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #eee;vertical-align:top;}
+th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;}
+td select{padding:6px 8px;border-radius:6px;border:1px solid #ddd;font-size:.8rem;}
+</style>
+</head>
+<body>
+
+<div id="loginView" class="login-wrap">
+  <div class="login-card">
+    <h2>🔒 Espace Admin</h2>
+    <p>Studacom — connectez-vous pour gérer le site.</p>
+    <div class="error-box" id="loginError"></div>
+    <form id="loginForm">
+      <div class="field"><label for="lUser">Nom d'utilisateur</label><input id="lUser" required autocomplete="username"></div>
+      <div class="field"><label for="lPass">Mot de passe</label><input id="lPass" type="password" required autocomplete="current-password"></div>
+      <button class="btn btn-amber btn-full" type="submit">Se connecter</button>
+    </form>
+  </div>
+</div>
+
+<div id="dashboardView" style="display:none;">
+  <header>
+    <h1>⚙️ Studacom — Espace Admin</h1>
+    <div class="right">
+      <a href="index.html">← Voir le site</a>
+      <button class="link" id="logoutBtn">Déconnexion</button>
+    </div>
+  </header>
+  <div class="wrap">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="services">Services</button>
+      <button class="tab-btn" data-tab="portfolio">Portfolio</button>
+      <button class="tab-btn" data-tab="testimonials">Témoignages</button>
+      <button class="tab-btn" data-tab="quotes">Demandes de devis</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-services">
+      <div class="panel">
+        <h2>🎯 Services</h2>
+        <div id="servicesList"></div>
+        <div class="actions">
+          <button class="btn btn-amber" id="addService">+ Ajouter un service</button>
+          <span class="saved-msg" id="svcSaved">✔ Enregistré</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-portfolio">
+      <div class="panel">
+        <h2>🖼️ Portfolio</h2>
+        <div id="folioList"></div>
+        <div class="actions">
+          <button class="btn btn-amber" id="addFolio">+ Ajouter une réalisation</button>
+          <span class="saved-msg" id="folioSaved">✔ Enregistré</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-testimonials">
+      <div class="panel">
+        <h2>💬 Témoignages</h2>
+        <div id="temoList"></div>
+        <div class="actions">
+          <button class="btn btn-amber" id="addTemo">+ Ajouter un témoignage</button>
+          <span class="saved-msg" id="temoSaved">✔ Enregistré</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-quotes">
+      <div class="panel">
+        <h2>📥 Demandes de devis</h2>
+        <div id="quotesTableWrap"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = window.STUDACOM_API_BASE;
+let TOKEN = sessionStorage.getItem("studacom_admin_token") || "";
+
+const loginView = document.getElementById("loginView");
+const dashboardView = document.getElementById("dashboardView");
+
+function showDashboard(){ loginView.style.display="none"; dashboardView.style.display="block"; loadAll(); }
+function showLogin(){ dashboardView.style.display="none"; loginView.style.display="flex"; }
+
+async function api(path, options={}){
+  const res = await fetch(`${API}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type":"application/json",
+      ...(TOKEN ? {Authorization:`Bearer ${TOKEN}`} : {}),
+      ...(options.headers||{}),
+    },
+  });
+  if(res.status === 401){
+    sessionStorage.removeItem("studacom_admin_token");
+    TOKEN = "";
+    showLogin();
+    throw new Error("Session expirée, reconnectez-vous.");
+  }
+  if(!res.ok){
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.error || `Erreur (${res.status})`);
+  }
+  return res.status === 204 ? null : res.json();
+}
+
+document.getElementById("loginForm").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const errBox = document.getElementById("loginError");
+  errBox.style.display = "none";
+  try{
+    const data = await api("/auth/login", {
+      method:"POST",
+      body: JSON.stringify({ username: document.getElementById("lUser").value, password: document.getElementById("lPass").value }),
+    });
+    TOKEN = data.token;
+    sessionStorage.setItem("studacom_admin_token", TOKEN);
+    showDashboard();
+  }catch(err){
+    errBox.textContent = err.message;
+    errBox.style.display = "block";
+  }
+});
+document.getElementById("logoutBtn").addEventListener("click", ()=>{
+  sessionStorage.removeItem("studacom_admin_token");
+  TOKEN = "";
+  showLogin();
+});
+
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
+  });
+});
+
+function flash(id){ const el=document.getElementById(id); el.style.display="inline"; setTimeout(()=>el.style.display="none",1800); }
+
+let services = [];
+async function loadServices(){ services = await api("/services"); renderServices(); }
+function renderServices(){
+  const list = document.getElementById("servicesList");
+  list.innerHTML = services.length ? services.map(s => `
+    <div class="row" data-id="${s.id}">
+      <input value="${s.icon}" data-field="icon">
+      <input value="${s.title}" data-field="title" placeholder="Titre">
+      <input value="${s.description}" data-field="description" placeholder="Description">
+      <button class="btn-navy" data-action="save">Enregistrer</button>
+      <button class="btn-danger" data-action="delete">✕</button>
+    </div>`).join("") : `<div class="empty">Aucun service pour le moment.</div>`;
+}
+document.getElementById("servicesList").addEventListener("click", async (e)=>{
+  const row = e.target.closest(".row"); if(!row) return;
+  const id = row.dataset.id;
+  if(e.target.dataset.action === "delete"){
+    if(!confirm("Supprimer ce service ?")) return;
+    await api(`/services/${id}`, {method:"DELETE"});
+    await loadServices();
+  }
+  if(e.target.dataset.action === "save"){
+    const body = {};
+    row.querySelectorAll("[data-field]").forEach(inp => body[inp.dataset.field] = inp.value);
+    await api(`/services/${id}`, {method:"PUT", body: JSON.stringify(body)});
+    flash("svcSaved");
+  }
+});
+document.getElementById("addService").addEventListener("click", async ()=>{
+  await api("/services", {method:"POST", body: JSON.stringify({icon:"✨", title:"Nouveau service", description:"Description du service..."})});
+  await loadServices();
+});
+
+let folio = [];
+const CATS = ["logo","flyer","social","web","video"];
+async function loadFolio(){ folio = await api("/portfolio"); renderFolio(); }
+function renderFolio(){
+  const list = document.getElementById("folioList");
+  list.innerHTML = folio.length ? folio.map(f => `
+    <div class="row" data-id="${f.id}" style="grid-template-columns:140px 1fr auto auto;">
+      <select data-field="category">
+        ${CATS.map(c=>`<option value="${c}" ${f.category===c?"selected":""}>${c}</option>`).join("")}
+      </select>
+      <input value="${f.label}" data-field="label" placeholder="Titre de la réalisation">
+      <button class="btn-navy" data-action="save">Enregistrer</button>
+      <button class="btn-danger" data-action="delete">✕</button>
+    </div>`).join("") : `<div class="empty">Aucune réalisation pour le moment.</div>`;
+}
+document.getElementById("folioList").addEventListener("click", async (e)=>{
+  const row = e.target.closest(".row"); if(!row) return;
+  const id = row.dataset.id;
+  if(e.target.dataset.action === "delete"){
+    if(!confirm("Supprimer cette réalisation ?")) return;
+    await api(`/portfolio/${id}`, {method:"DELETE"});
+    await loadFolio();
+  }
+  if(e.target.dataset.action === "save"){
+    const body = {};
+    row.querySelectorAll("[data-field]").forEach(inp => body[inp.dataset.field] = inp.value);
+    await api(`/portfolio/${id}`, {method:"PUT", body: JSON.stringify(body)});
+    flash("folioSaved");
+  }
+});
+document.getElementById("addFolio").addEventListener("click", async ()=>{
+  await api("/portfolio", {method:"POST", body: JSON.stringify({category:"logo", label:"Nouvelle réalisation"})});
+  await loadFolio();
+});
+
+let temoignages = [];
+async function loadTemo(){ temoignages = await api("/testimonials/all"); renderTemo(); }
+function renderTemo(){
+  const list = document.getElementById("temoList");
+  list.innerHTML = temoignages.length ? temoignages.map(t => `
+    <div class="row" data-id="${t.id}" style="grid-template-columns:1fr 1fr 2fr 70px auto auto;">
+      <input value="${t.author}" data-field="author" placeholder="Nom">
+      <input value="${t.role||""}" data-field="role" placeholder="Rôle / entreprise">
+      <input value="${t.quote}" data-field="quote" placeholder="Avis">
+      <select data-field="rating">${[5,4,3,2,1].map(n=>`<option value="${n}" ${t.rating===n?"selected":""}>${n}★</option>`).join("")}</select>
+      <button class="btn-navy" data-action="save">Enregistrer</button>
+      <button class="btn-danger" data-action="delete">✕</button>
+    </div>`).join("") : `<div class="empty">Aucun témoignage pour le moment.</div>`;
+}
+document.getElementById("temoList").addEventListener("click", async (e)=>{
+  const row = e.target.closest(".row"); if(!row) return;
+  const id = row.dataset.id;
+  if(e.target.dataset.action === "delete"){
+    if(!confirm("Supprimer ce témoignage ?")) return;
+    await api(`/testimonials/${id}`, {method:"DELETE"});
+    await loadTemo();
+  }
+  if(e.target.dataset.action === "save"){
+    const body = {};
+    row.querySelectorAll("[data-field]").forEach(inp => body[inp.dataset.field] = inp.dataset.field==="rating" ? Number(inp.value) : inp.value);
+    await api(`/testimonials/${id}`, {method:"PUT", body: JSON.stringify(body)});
+    flash("temoSaved");
+  }
+});
+document.getElementById("addTemo").addEventListener("click", async ()=>{
+  await api("/testimonials", {method:"POST", body: JSON.stringify({author:"Nouveau client", role:"", quote:"Avis à compléter...", rating:5})});
+  await loadTemo();
+});
+
+const STATUS_LABELS = {nouveau:"Nouveau", en_cours:"En cours", traite:"Traité", archive:"Archivé"};
+async function loadQuotes(){
+  const quotes = await api("/quotes");
+  const wrap = document.getElementById("quotesTableWrap");
+  if(!quotes.length){ wrap.innerHTML = `<div class="empty">Aucune demande reçue pour le moment.</div>`; return; }
+  wrap.innerHTML = `
+    <table>
+      <thead><tr><th>Date</th><th>Nom</th><th>Contact</th><th>Service</th><th>Budget</th><th>Description</th><th>Statut</th><th></th></tr></thead>
+      <tbody>
+        ${quotes.map(q => `
+          <tr data-id="${q.id}">
+            <td>${new Date(q.created_at.replace(" ","T")+"Z").toLocaleDateString("fr-FR")}</td>
+            <td>${q.name}</td>
+            <td>${q.phone}<br>${q.email}</td>
+            <td>${q.service}</td>
+            <td>${q.budget||"—"}</td>
+            <td style="max-width:220px;">${q.description||"—"}</td>
+            <td>
+              <select data-action="status">
+                ${Object.entries(STATUS_LABELS).map(([k,v])=>`<option value="${k}" ${q.status===k?"selected":""}>${v}</option>`).join("")}
+              </select>
+            </td>
+            <td><button class="btn-danger" data-action="delete">✕</button></td>
+          </tr>`).join("")}
+      </tbody>
+    </table>`;
+}
+document.getElementById("quotesTableWrap").addEventListener("change", async (e)=>{
+  if(e.target.dataset.action !== "status") return;
+  const id = e.target.closest("tr").dataset.id;
+  await api(`/quotes/${id}`, {method:"PUT", body: JSON.stringify({status: e.target.value})});
+});
+document.getElementById("quotesTableWrap").addEventListener("click", async (e)=>{
+  if(e.target.dataset.action !== "delete") return;
+  if(!confirm("Supprimer définitivement cette demande ?")) return;
+  const id = e.target.closest("tr").dataset.id;
+  await api(`/quotes/${id}`, {method:"DELETE"});
+  await loadQuotes();
+});
+
+async function loadAll(){
+  try{ await Promise.all([loadServices(), loadFolio(), loadTemo(), loadQuotes()]); }
+  catch(err){ console.error(err); }
+}
+
+if(TOKEN){ showDashboard(); } else { showLogin(); }
+</script>
+</body>
+</html>
